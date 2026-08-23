@@ -28,13 +28,16 @@ object luisa {
     - El elemento recibe ataque con valor = potencia del arma
     - El arma registra que fue usada, siempre y cuando esté cargada
 */
+
+// Personajes
 object floki {
     var armaActual = ballesta
 
-    method cambiarDeArma(armaNueva) { armaActual = armaNueva }
-    method encontrar(elemento) {
+    method cambiarDeArma(nuevaArma) { armaActual = nuevaArma }
+
+    method encontrar(unElemento) {
         if (armaActual.estaCargada()) {
-            elemento.recibirAtaque(armaActual.potencia())
+            unElemento.recibirAtaque(armaActual.potencia())
             armaActual.registrarUso()
         }
     }
@@ -55,10 +58,10 @@ object mario {
     var valorRecolectado = 0
     var ultimoElementoEncontrado = aurora
 
-    method encontrar(elemento) {
-        valorRecolectado += elemento.puntosQueOtorga()
-        elemento.recibirTrabajo()
-        ultimoElementoEncontrado = elemento
+    method encontrar(unElemento) {
+        valorRecolectado += unElemento.puntosQueOtorga()
+        unElemento.recibirTrabajo()
+        ultimoElementoEncontrado = unElemento
     }
     method estaFeliz() = valorRecolectado >= 50 or ultimoElementoEncontrado.altura() >= 10
 
@@ -76,8 +79,9 @@ object ballesta {
     var cantidadDeFlechas = 10
 
     method potencia() = 4
-    method registrarUso() { cantidadDeFlechas -= 1 }
     method estaCargada() = cantidadDeFlechas > 0
+    method registrarUso() { cantidadDeFlechas -= 1 }
+
 }
 
 /*
@@ -95,8 +99,9 @@ object jabalina {
     var estaCargada = true
 
     method potencia() = 30
-    method registrarUso() { estaCargada = false }
     method estaCargada() = estaCargada //getter
+    method registrarUso() { estaCargada = false }
+
 }
 
 
@@ -110,7 +115,23 @@ object jabalina {
     Al recibir trabajo, aumenta defensa en 20, con tope 200
 */
 object castillo {
+    var nivelDeDefensa = 150
+    var alturaActual = 20
 
+    method altura() = alturaActual
+    method nivelDeDefesa() = nivelDeDefensa
+
+    method recibirAtaque(potencia) {
+        nivelDeDefensa -= potencia
+    }
+
+    method valorRecolectado() {
+       return nivelDeDefensa / 5
+    }
+
+    method recibirTrabajo() {
+        nivelDeDefensa = (nivelDeDefensa + 20).min(200)
+    }
 }
 
 /*
@@ -122,6 +143,19 @@ object castillo {
     Al recibir trabajo no pasa nada
 */
 object aurora {
+    var viva = true
+    var alturaActual = 1
+
+    method altura() = alturaActual
+    method estaViva() = viva
+
+    method recibirAtaque(potencia) {
+        if (potencia >= 10) {
+            viva = false
+        }
+    }
+
+    method valorRecolectado() = 15
     method recibirTrabajo() { }
 }
 
@@ -133,5 +167,17 @@ object aurora {
     Al recibir trabajo, altura crece 1 metro
 */
 object tipa {
+    var alturaActual = 8
+
+    method altura() = alturaActual
+
     method recibirAtaque(potenciaDelArma) { }
+
+    method valorRecolectado() {
+        return alturaActual * 2
+    }
+
+    method recibirTrabajo() {
+        alturaActual += 1
+    }
 }
